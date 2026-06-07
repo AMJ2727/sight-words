@@ -320,7 +320,7 @@ function answer(btn,word){
     b.disabled=true;
     if(b.textContent===pr.current)b.className="choice-btn correct";
   });
-  if(!correct)btn.className="choice-btn wrong";
+  if(!correct){btn.className="choice-btn wrong";playWrong();}
   if(correct){
     pr.correct++;pr.streak++;
     pr.mastered[pr.current]=(pr.mastered[pr.current]||0)+1;
@@ -337,6 +337,7 @@ function answer(btn,word){
 }
 
 function showCelebration(){
+  playCorrect(p().streak);
   const msgs=currentPlayer==="mermaid"?CELEBRATE_MERMAID:CELEBRATE_ASTRONAUT;
   document.getElementById("feedback").textContent=msgs[Math.floor(Math.random()*msgs.length)];
   document.getElementById("word-card").className="word-card correct";
@@ -392,6 +393,7 @@ function updateStats(){
 }
 
 function showComplete(){
+  playLevelComplete();
   document.getElementById("quiz-area").style.display="none";
   document.getElementById("complete-area").style.display="block";
   const pr=p();
@@ -440,6 +442,105 @@ function tryLevel(level){
 }
 
 loadProgress();
-</script>
+
+let audioCtx=null;
+function getAudio(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTap(){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type="sine";o.frequency.setValueAtTime(600,ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.06);
+    g.gain.setValueAtTime(0.15,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
+    o.start(ctx.currentTime);o.stop(ctx.currentTime+0.1);
+  }catch(e){}
+}
+
+function playCorrect(streak){
+  try{
+    const ctx=getAudio();
+    const notes=streak>=5?[523,659,784,1047]:streak>=3?[523,659,784]:[523,659];
+    notes.forEach((freq,i)=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type="sine";
+      const t=ctx.currentTime+i*0.12;
+      o.frequency.setValueAtTime(freq,t);
+      g.gain.setValueAtTime(0.0,t);
+      g.gain.linearRampToValueAtTime(0.2,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.start(t);o.stop(t+0.2);
+    });
+  }catch(e){}
+}
+
+function playWrong(){
+  try{
+    const ctx=getAudio();
+    [[220,0],[196,0.2]].forEach(([freq,delay])=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type="sawtooth";
+      const t=ctx.currentTime+delay;
+      o.frequency.setValueAtTime(freq,t);
+      o.frequency.exponentialRampToValueAtTime(freq*0.7,t+0.25);
+      g.gain.setValueAtTime(0.12,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+      o.start(t);o.stop(t+0.3);
+    });
+  }catch(e){}
+}
+
+function playLevelComplete(){
+  try{
+    const ctx=getAudio();
+    const melody=[523,587,659,698,784,880,988,1047];
+    melody.forEach((freq,i)=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type="sine";
+      const t=ctx.currentTime+i*0.1;
+      o.frequency.setValueAtTime(freq,t);
+      g.gain.setValueAtTime(0.0,t);
+      g.gain.linearRampToValueAtTime(0.18,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+      o.start(t);o.stop(t+0.22);
+    });
+    setTimeout(()=>{
+      try{
+        const melody2=[1047,988,880,784,880,1047];
+        melody2.forEach((freq,i)=>{
+          const o=ctx.createOscillator();
+          const g=ctx.createGain();
+          o.connect(g);g.connect(ctx.destination);
+          o.type="sine";
+          const t=ctx.currentTime+i*0.1;
+          o.frequency.setValueAtTime(freq,t);
+          g.gain.setValueAtTime(0.0,t);
+          g.gain.linearRampToValueAtTime(0.15,t+0.02);
+          g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+          o.start(t);o.stop(t+0.22);
+        });
+      }catch(e){}
+    },900);
+  }catch(e){}
+}
+
+
+
+document.querySelectorAll('.action-btn,.lpill,.switch-btn,.picker-card').forEach(el=>{
+  el.addEventListener('touchstart',()=>playTap(),{passive:true});
+});
+
 </body>
 </html>
