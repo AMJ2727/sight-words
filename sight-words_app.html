@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sight Words">
+<title>Sight Words</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f7ff; min-height: 100vh; }
+  .app { padding: 1rem; max-width: 420px; margin: 0 auto; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .picker-title { font-size: 28px; font-weight: 600; text-align: center; margin: 1.5rem 0 0.25rem; color: #1a1a2e; }
+  .picker-sub { font-size: 16px; color: #666; text-align: center; margin-bottom: 1.5rem; }
+  .picker-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 1rem; }
+  .picker-card { border-radius: 24px; padding: 2rem 1rem; text-align: center; cursor: pointer; border: 3px solid transparent; transition: transform 0.15s; -webkit-tap-highlight-color: transparent; }
+  .picker-card:active { transform: scale(0.95); }
+  .picker-card.mermaid { background: #ddf0ff; border-color: #85B7EB; }
+  .picker-card.astronaut { background: #eeecfe; border-color: #AFA9EC; }
+  .picker-mascot { font-size: 56px; margin-bottom: 10px; }
+  .picker-name { font-size: 18px; font-weight: 600; }
+  .picker-card.mermaid .picker-name { color: #0C447C; }
+  .picker-card.astronaut .picker-name { color: #3C3489; }
+  .picker-tagline { font-size: 13px; margin-top: 4px; }
+  .picker-card.mermaid .picker-tagline { color: #185FA5; }
+  .picker-card.astronaut .picker-tagline { color: #534AB7; }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .player-badge { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 99px; font-size: 14px; font-weight: 600; }
+  .player-badge.mermaid { background: #ddf0ff; color: #0C447C; }
+  .player-badge.astronaut { background: #eeecfe; color: #3C3489; }
+  .switch-btn { font-size: 13px; color: #888; cursor: pointer; padding: 6px 12px; border-radius: 10px; border: 1px solid #ddd; background: white; -webkit-tap-highlight-color: transparent; }
+
+  .level-pills { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .lpill { padding: 8px 14px; border-radius: 99px; font-size: 13px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+  .mermaid-theme .lpill-prek { background: #ddf0ff; color: #185FA5; border-color: #85B7EB; }
+  .mermaid-theme .lpill-prek.active { background: #185FA5; color: white; }
+  .mermaid-theme .lpill-k { background: #e0f5ee; color: #0F6E56; border-color: #5DCAA5; }
+  .mermaid-theme .lpill-k.active { background: #0F6E56; color: white; }
+  .mermaid-theme .lpill-1 { background: #fce9f0; color: #72243E; border-color: #ED93B1; }
+  .mermaid-theme .lpill-1.active { background: #72243E; color: white; }
+  .astronaut-theme .lpill-prek { background: #eeecfe; color: #534AB7; border-color: #AFA9EC; }
+  .astronaut-theme .lpill-prek.active { background: #534AB7; color: white; }
+  .astronaut-theme .lpill-k { background: #fef3da; color: #633806; border-color: #EF9F27; }
+  .astronaut-theme .lpill-k.active { background: #633806; color: white; }
+  .astronaut-theme .lpill-1 { background: #eaf3de; color: #27500A; border-color: #97C459; }
+  .astronaut-theme .lpill-1.active { background: #27500A; color: white; }
+  .lpill.locked { opacity: 0.4; cursor: not-allowed; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .stat-card { border-radius: 14px; padding: 10px 6px; text-align: center; }
+  .stat-val { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 11px; margin-top: 2px; font-weight: 500; }
+  .mermaid-theme .stat-card { background: #ddf0ff; }
+  .mermaid-theme .stat-val { color: #0C447C; }
+  .mermaid-theme .stat-label { color: #185FA5; }
+  .astronaut-theme .stat-card { background: #eeecfe; }
+  .astronaut-theme .stat-val { color: #3C3489; }
+  .astronaut-theme .stat-label { color: #534AB7; }
+
+  .prog-wrap { border-radius: 99px; height: 12px; margin-bottom: 4px; overflow: hidden; }
+  .mermaid-theme .prog-wrap { background: #ddf0ff; }
+  .astronaut-theme .prog-wrap { background: #eeecfe; }
+  .prog-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+  .mermaid-theme .prog-fill { background: #378ADD; }
+  .astronaut-theme .prog-fill { background: #7F77DD; }
+  .prog-label { font-size: 12px; color: #888; margin-bottom: 14px; }
+
+  .mascot-row { text-align: center; font-size: 52px; margin-bottom: 8px; transition: transform 0.3s; }
+  .mascot-row.bounce { animation: mascot-bounce 0.4s ease; }
+  @keyframes mascot-bounce { 0%{transform:scale(1)} 40%{transform:scale(1.4)} 70%{transform:scale(0.88)} 100%{transform:scale(1)} }
+
+  .word-card { border-radius: 24px; padding: 2rem 1rem 1.5rem; text-align: center; margin-bottom: 12px; border: 3px solid transparent; transition: border-color 0.3s, background 0.3s; }
+  .mermaid-theme .word-card { background: #ddf0ff; border-color: #85B7EB; }
+  .astronaut-theme .word-card { background: #eeecfe; border-color: #AFA9EC; }
+  .word-card.correct { background: #e0f5ee; border-color: #1D9E75; }
+  .word-card.wrong { background: #fce8e8; border-color: #E24B4A; }
+  .word-display { font-size: 64px; font-weight: 700; color: #1a1a2e; letter-spacing: 4px; line-height: 1.1; }
+  .word-prompt { font-size: 14px; color: #888; margin-top: 8px; }
+
+  .stars-row { display: flex; justify-content: center; gap: 6px; min-height: 32px; margin-bottom: 8px; }
+  .feedback { text-align: center; font-size: 18px; font-weight: 600; min-height: 28px; margin-bottom: 10px; color: #1a1a2e; }
+  .phase-label { text-align: center; font-size: 14px; color: #888; margin-bottom: 10px; }
+
+  .choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+  .choice-btn { border-radius: 18px; padding: 18px 8px; font-size: 26px; font-weight: 700; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; text-align: center; -webkit-tap-highlight-color: transparent; }
+  .choice-btn:active { transform: scale(0.93); }
+  .mermaid-theme .choice-btn.cb1 { background: #ddf0ff; color: #0C447C; border-color: #85B7EB; }
+  .mermaid-theme .choice-btn.cb2 { background: #e0f5ee; color: #085041; border-color: #5DCAA5; }
+  .mermaid-theme .choice-btn.cb3 { background: #fce9f0; color: #72243E; border-color: #ED93B1; }
+  .mermaid-theme .choice-btn.cb4 { background: #fef3da; color: #633806; border-color: #EF9F27; }
+  .astronaut-theme .choice-btn.cb1 { background: #eeecfe; color: #3C3489; border-color: #AFA9EC; }
+  .astronaut-theme .choice-btn.cb2 { background: #fef3da; color: #633806; border-color: #EF9F27; }
+  .astronaut-theme .choice-btn.cb3 { background: #eaf3de; color: #27500A; border-color: #97C459; }
+  .astronaut-theme .choice-btn.cb4 { background: #fce9f0; color: #72243E; border-color: #ED93B1; }
+  .choice-btn.correct { background: #e0f5ee; border-color: #1D9E75; color: #085041; }
+  .choice-btn.wrong { background: #fce8e8; border-color: #E24B4A; color: #7a1f1f; }
+  .choice-btn:disabled { cursor: default; }
+
+  .action-btn { width: 100%; padding: 16px; border-radius: 18px; font-size: 17px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; }
+  .action-btn:active { transform: scale(0.97); }
+  .mermaid-theme .quiz-btn { background: #185FA5; color: white; }
+  .mermaid-theme .next-btn { background: #e0f5ee; color: #085041; border: 2px solid #5DCAA5; }
+  .astronaut-theme .quiz-btn { background: #534AB7; color: white; }
+  .astronaut-theme .next-btn { background: #e0f5ee; color: #085041; border: 2px solid #5DCAA5; }
+
+  .unlock-banner { border-radius: 14px; padding: 12px 16px; font-size: 14px; text-align: center; margin-bottom: 12px; display: none; font-weight: 500; }
+  .mermaid-theme .unlock-banner { background: #ddf0ff; border: 2px solid #85B7EB; color: #0C447C; }
+  .astronaut-theme .unlock-banner { background: #fef3da; border: 2px solid #EF9F27; color: #633806; }
+
+  .complete-card { border-radius: 24px; padding: 2.5rem 1.5rem; text-align: center; border: 3px solid; }
+  .mermaid-theme .complete-card { background: #ddf0ff; border-color: #85B7EB; }
+  .astronaut-theme .complete-card { background: #eeecfe; border-color: #AFA9EC; }
+  .complete-emoji { font-size: 56px; margin-bottom: 10px; }
+  .complete-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .mermaid-theme .complete-title { color: #0C447C; }
+  .astronaut-theme .complete-title { color: #3C3489; }
+  .complete-sub { font-size: 15px; margin-bottom: 1.5rem; }
+  .mermaid-theme .complete-sub { color: #185FA5; }
+  .astronaut-theme .complete-sub { color: #534AB7; }
+  .confetti-wrap { position: relative; overflow: hidden; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="screen active" id="picker-screen">
+    <div class="picker-title">Sight Words! ✨</div>
+    <div class="picker-sub">Who's playing today?</div>
+    <div class="picker-cards">
+      <div class="picker-card mermaid" onclick="selectPlayer('mermaid')">
+        <div class="picker-mascot">🧜‍♀️</div>
+        <div class="picker-name">Mermaid</div>
+        <div class="picker-tagline">Ocean adventure</div>
+      </div>
+      <div class="picker-card astronaut" onclick="selectPlayer('astronaut')">
+        <div class="picker-mascot">👨‍🚀</div>
+        <div class="picker-name">Astronaut</div>
+        <div class="picker-tagline">Space mission</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="game-screen">
+    <div class="top-bar">
+      <div class="player-badge" id="player-badge">🧜‍♀️ Mermaid</div>
+      <button class="switch-btn" onclick="goHome()">switch player</button>
+    </div>
+
+    <div class="level-pills" id="level-pills">
+      <button class="lpill lpill-prek active" id="btn-prek" onclick="switchLevel('prek')">Pre-K</button>
+      <button class="lpill lpill-k locked" id="btn-k" onclick="tryLevel('k')">Kindergarten 🔒</button>
+      <button class="lpill lpill-1 locked" id="btn-1" onclick="tryLevel('1')">Grade 1 🔒</button>
+    </div>
+
+    <div class="unlock-banner" id="unlock-banner"></div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val" id="stat-correct">0</div><div class="stat-label">correct</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-label">streak 🔥</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-mastered">0</div><div class="stat-label">mastered</div></div>
+    </div>
+
+    <div class="prog-wrap"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+    <div class="prog-label" id="prog-label">0 of 40 words mastered</div>
+
+    <div id="quiz-area">
+      <div class="mascot-row" id="mascot-display">🧜‍♀️</div>
+      <div class="confetti-wrap" id="confetti-wrap">
+        <div class="word-card" id="word-card">
+          <div class="word-display" id="word-display">the</div>
+          <div class="word-prompt" id="word-prompt">Look at this word!</div>
+        </div>
+      </div>
+      <div class="stars-row" id="stars-row"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="phase-label" id="phase-label">Ready to be quizzed?</div>
+      <div class="choices" id="choices" style="display:none"></div>
+      <button class="action-btn quiz-btn" id="flash-btn" onclick="startQuiz()">Quiz me! 🚀</button>
+      <button class="action-btn next-btn" id="next-btn" style="display:none" onclick="nextWord()">Next word →</button>
+    </div>
+
+    <div id="complete-area" style="display:none">
+      <div class="complete-card">
+        <div class="complete-emoji" id="complete-emoji">🎉</div>
+        <div class="complete-title" id="complete-title">Level complete!</div>
+        <div class="complete-sub" id="complete-sub"></div>
+        <button class="action-btn quiz-btn" id="complete-btn" onclick="levelComplete()">Keep going! 🌟</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const WORDS={prek:["a","and","away","big","blue","can","come","down","find","for","funny","go","help","here","I","in","is","it","jump","little","look","make","me","my","not","one","play","red","run","said","see","the","three","to","two","up","we","where","yellow","you"],k:["all","am","are","at","ate","be","black","brown","but","came","did","do","eat","four","get","good","have","he","into","like","must","new","no","now","on","our","out","please","pretty","ran","ride","saw","say","she","so","soon","that","there","they","this","too","under","want","was","well","went","what","white","who","will","with","yes"],"1":["after","again","an","any","ask","by","could","every","fly","from","give","going","had","has","her","him","his","how","just","know","let","live","may","of","old","once","open","over","put","round","some","stop","take","thank","them","think","walk","were","when"]};
+const LEVEL_NAMES={prek:"Pre-K",k:"Kindergarten","1":"Grade 1"};
+const UNLOCK_NEXT={prek:"k",k:"1"};
+const MASCOTS={mermaid:"🧜‍♀️",astronaut:"👨‍🚀"};
+const CELEBRATE_MERMAID=["You found it! 🐚","Swimmingly done! 🌊","Magical! 🧜‍♀️","Ocean star! ⭐","Shell-ebrate! 🐠"];
+const CELEBRATE_ASTRONAUT=["Houston, we got it! 🚀","Blast off! 🌟","Out of this world! 🪐","Mission complete! 👨‍🚀","Star power! ✨"];
+
+const STORAGE_KEY="sightwords_progress";
+
+let players={
+  mermaid:{level:"prek",queue:[],current:null,correct:0,streak:0,mastered:{},unlocked:{prek:true,k:false,"1":false}},
+  astronaut:{level:"prek",queue:[],current:null,correct:0,streak:0,mastered:{},unlocked:{prek:true,k:false,"1":false}}
+};
+let currentPlayer=null;
+let answered=false;
+
+function saveProgress(){
+  try{
+    const data={mermaid:{correct:players.mermaid.correct,streak:players.mermaid.streak,mastered:players.mermaid.mastered,unlocked:players.mermaid.unlocked,level:players.mermaid.level},astronaut:{correct:players.astronaut.correct,streak:players.astronaut.streak,mastered:players.astronaut.mastered,unlocked:players.astronaut.unlocked,level:players.astronaut.level}};
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+
+function loadProgress(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const data=JSON.parse(saved);
+      ["mermaid","astronaut"].forEach(pl=>{
+        if(data[pl]){
+          players[pl].correct=data[pl].correct||0;
+          players[pl].streak=data[pl].streak||0;
+          players[pl].mastered=data[pl].mastered||{};
+          players[pl].unlocked=data[pl].unlocked||{prek:true,k:false,"1":false};
+          players[pl].level=data[pl].level||"prek";
+        }
+      });
+    }
+  }catch(e){}
+}
+
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function p(){return players[currentPlayer];}
+function getMastered(level){return Object.keys(p().mastered).filter(w=>p().mastered[w]>=2&&WORDS[level].includes(w)).length;}
+
+function selectPlayer(player){
+  currentPlayer=player;
+  document.getElementById("picker-screen").className="screen";
+  const gs=document.getElementById("game-screen");
+  gs.className="screen active "+(player==="mermaid"?"mermaid-theme":"astronaut-theme");
+  document.getElementById("player-badge").className="player-badge "+player;
+  document.getElementById("player-badge").textContent=MASCOTS[player]+" "+(player==="mermaid"?"Mermaid":"Astronaut");
+  document.getElementById("mascot-display").textContent=MASCOTS[player];
+  const pr=p();
+  if(!pr.current){
+    pr.queue=shuffle(WORDS[pr.level].filter(w=>(pr.mastered[w]||0)<2));
+    pr.current=pr.queue.length>0?pr.queue.shift():WORDS[pr.level][0];
+  }
+  updateLevelPills();
+  renderWord();
+  updateStats();
+  document.getElementById("complete-area").style.display="none";
+  document.getElementById("quiz-area").style.display="block";
+}
+
+function goHome(){
+  document.getElementById("game-screen").className="screen";
+  document.getElementById("picker-screen").className="screen active";
+}
+
+function updateLevelPills(){
+  const pr=p();
+  ["prek","k","1"].forEach(lv=>{
+    const btn=document.getElementById("btn-"+lv);
+    btn.className="lpill lpill-"+lv+(pr.level===lv?" active":"")+(pr.unlocked[lv]?"":" locked");
+    const labels={prek:"Pre-K",k:"Kindergarten","1":"Grade 1"};
+    btn.innerHTML=labels[lv]+(pr.unlocked[lv]?"":" 🔒");
+    btn.onclick=pr.unlocked[lv]?()=>switchLevel(lv):()=>tryLevel(lv);
+  });
+}
+
+function renderWord(){
+  const pr=p();
+  document.getElementById("word-display").textContent=pr.current;
+  document.getElementById("word-prompt").textContent="Look at this word!";
+  document.getElementById("feedback").textContent="";
+  document.getElementById("stars-row").innerHTML="";
+  document.getElementById("choices").style.display="none";
+  document.getElementById("flash-btn").style.display="block";
+  document.getElementById("next-btn").style.display="none";
+  document.getElementById("phase-label").textContent="Ready to be quizzed?";
+  document.getElementById("word-card").className="word-card";
+  answered=false;
+}
+
+function startQuiz(){
+  document.getElementById("flash-btn").style.display="none";
+  document.getElementById("phase-label").textContent="Which word do you see?";
+  const pr=p();
+  let wrong=shuffle(WORDS[pr.level].filter(w=>w!==pr.current)).slice(0,3);
+  let opts=shuffle([pr.current,...wrong]);
+  const box=document.getElementById("choices");
+  box.innerHTML="";box.style.display="grid";
+  opts.forEach((w,i)=>{
+    const b=document.createElement("button");
+    b.className="choice-btn cb"+(i+1);
+    b.textContent=w;
+    b.onclick=()=>answer(b,w);
+    box.appendChild(b);
+  });
+}
+
+function answer(btn,word){
+  if(answered)return;
+  answered=true;
+  const pr=p();
+  const correct=word===pr.current;
+  document.querySelectorAll(".choice-btn").forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===pr.current)b.className="choice-btn correct";
+  });
+  if(!correct)btn.className="choice-btn wrong";
+  if(correct){
+    pr.correct++;pr.streak++;
+    pr.mastered[pr.current]=(pr.mastered[pr.current]||0)+1;
+    showCelebration();
+  }else{
+    pr.streak=0;
+    document.getElementById("feedback").textContent="Almost! Try again soon!";
+    document.getElementById("word-card").className="word-card wrong";
+    if(pr.mastered[pr.current]>0)pr.mastered[pr.current]--;
+  }
+  updateStats();
+  saveProgress();
+  document.getElementById("next-btn").style.display="block";
+}
+
+function showCelebration(){
+  const msgs=currentPlayer==="mermaid"?CELEBRATE_MERMAID:CELEBRATE_ASTRONAUT;
+  document.getElementById("feedback").textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById("word-card").className="word-card correct";
+  const mascot=document.getElementById("mascot-display");
+  mascot.classList.remove("bounce");
+  void mascot.offsetWidth;
+  mascot.classList.add("bounce");
+  const pr=p();
+  const count=pr.streak>=5?4:pr.streak>=3?3:pr.streak>=2?2:1;
+  const row=document.getElementById("stars-row");
+  row.innerHTML="";
+  ["⭐","🌟","💫","✨"].slice(0,count).forEach((icon,i)=>{
+    const s=document.createElement("span");
+    s.textContent=icon;
+    s.style.cssText="font-size:26px;opacity:0;transition:opacity 0.2s "+(i*0.12)+"s,transform 0.2s "+(i*0.12)+"s;transform:scale(0.4)";
+    row.appendChild(s);
+    setTimeout(()=>{s.style.opacity="1";s.style.transform="scale(1)";},50);
+  });
+  if(pr.streak>=3)spawnConfetti();
+}
+
+function spawnConfetti(){
+  const wrap=document.getElementById("confetti-wrap");
+  const colors=currentPlayer==="mermaid"?["#378ADD","#1D9E75","#D4537E","#85B7EB","#5DCAA5"]:["#7F77DD","#EF9F27","#639922","#AFA9EC","#D85A30"];
+  for(let i=0;i<24;i++){
+    const pc=document.createElement("div");
+    pc.style.cssText=`position:absolute;width:10px;height:10px;border-radius:3px;background:${colors[i%colors.length]};left:${Math.random()*100}%;top:10%;pointer-events:none;opacity:0`;
+    wrap.appendChild(pc);
+    const tx=(Math.random()-0.5)*100,ty=80+Math.random()*90;
+    pc.animate([{opacity:1,transform:"translate(0,0) rotate(0deg)"},{opacity:0,transform:`translate(${tx}px,${ty}px) rotate(${Math.random()*400}deg)`}],{duration:700+Math.random()*400,easing:"ease-out",fill:"forwards"});
+    setTimeout(()=>pc.remove(),1300);
+  }
+}
+
+function nextWord(){
+  const pr=p();
+  const remaining=WORDS[pr.level].filter(w=>(pr.mastered[w]||0)<2);
+  if(remaining.length===0){showComplete();return;}
+  if(pr.queue.length===0)pr.queue=shuffle(remaining);
+  pr.current=pr.queue.shift();
+  renderWord();
+}
+
+function updateStats(){
+  const pr=p();
+  document.getElementById("stat-correct").textContent=pr.correct;
+  document.getElementById("stat-streak").textContent=pr.streak;
+  const mastered=getMastered(pr.level);
+  document.getElementById("stat-mastered").textContent=mastered;
+  const total=WORDS[pr.level].length;
+  document.getElementById("prog-bar").style.width=Math.round((mastered/total)*100)+"%";
+  document.getElementById("prog-label").textContent=mastered+" of "+total+" words mastered";
+}
+
+function showComplete(){
+  document.getElementById("quiz-area").style.display="none";
+  document.getElementById("complete-area").style.display="block";
+  const pr=p();
+  const next=UNLOCK_NEXT[pr.level];
+  document.getElementById("complete-emoji").textContent=currentPlayer==="mermaid"?"🐚":"🚀";
+  if(next&&!pr.unlocked[next]){
+    pr.unlocked[next]=true;
+    saveProgress();
+    updateLevelPills();
+    document.getElementById("complete-title").textContent="New level unlocked! 🔓";
+    document.getElementById("complete-sub").textContent=LEVEL_NAMES[next]+" is now open!";
+  }else if(next){
+    document.getElementById("complete-title").textContent="Level complete!";
+    document.getElementById("complete-sub").textContent="All "+LEVEL_NAMES[pr.level]+" words mastered!";
+  }else{
+    document.getElementById("complete-title").textContent=currentPlayer==="mermaid"?"Mermaid champion! 🌊":"Space legend! 🪐";
+    document.getElementById("complete-sub").textContent="All three levels mastered. Amazing!";
+    document.getElementById("complete-btn").style.display="none";
+  }
+}
+
+function levelComplete(){
+  const next=UNLOCK_NEXT[p().level];
+  if(next&&p().unlocked[next])switchLevel(next);
+}
+
+function switchLevel(level){
+  const pr=p();
+  if(!pr.unlocked[level])return;
+  pr.level=level;
+  pr.queue=shuffle(WORDS[level].filter(w=>(pr.mastered[w]||0)<2));
+  pr.current=pr.queue.length>0?pr.queue.shift():WORDS[level][0];
+  updateLevelPills();
+  renderWord();updateStats();
+  document.getElementById("complete-area").style.display="none";
+  document.getElementById("quiz-area").style.display="block";
+}
+
+function tryLevel(level){
+  if(p().unlocked[level]){switchLevel(level);return;}
+  const banner=document.getElementById("unlock-banner");
+  const prev=level==="k"?"Pre-K":"Kindergarten";
+  banner.textContent="🔒 Master all "+prev+" words first!";
+  banner.style.display="block";
+  setTimeout(()=>banner.style.display="none",2500);
+}
+
+loadProgress();
+</script>
+</body>
+</html>
