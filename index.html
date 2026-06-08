@@ -42,44 +42,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cancel-btn{width:100%;padding:12px;border-radius:16px;font-size:14px;cursor:pointer;border:2px solid #eee;background:none;color:#888;margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
 .danger-btn{width:100%;padding:10px;border-radius:16px;font-size:13px;cursor:pointer;border:2px solid #fce8e8;background:none;color:#E24B4A;-webkit-tap-highlight-color:transparent;}
 
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .player-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:14px;font-weight:700;background:#e8faf9;color:#0a5450;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .switch-btn{font-size:12px;color:#888;cursor:pointer;padding:6px 10px;border-radius:10px;border:1px solid #ddd;background:white;-webkit-tap-highlight-color:transparent;}
 
-.level-pills{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
-.lpill{padding:7px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.level-pills{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap;}
+.lpill{padding:5px 10px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
 .lpill.locked{opacity:0.4;cursor:not-allowed;}
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.stat-card{border-radius:14px;padding:10px 6px;text-align:center;}
-.stat-val{font-size:22px;font-weight:700;}
-.stat-label{font-size:11px;margin-top:2px;font-weight:600;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;}
+.stat-card{border-radius:12px;padding:6px 4px;text-align:center;}
+.stat-val{font-size:18px;font-weight:700;}
+.stat-label{font-size:10px;margin-top:1px;font-weight:600;}
 
-.prog-wrap{border-radius:99px;height:12px;margin-bottom:4px;overflow:hidden;}
+.prog-wrap{border-radius:99px;height:8px;margin-bottom:2px;overflow:hidden;}
 .prog-fill{height:100%;border-radius:99px;transition:width 0.5s ease;}
-.prog-label{font-size:12px;color:#888;margin-bottom:12px;}
+.prog-label{font-size:11px;color:#888;margin-bottom:6px;}
 
-.mascot-row{text-align:center;font-size:52px;margin-bottom:8px;}
+.mascot-row{text-align:center;font-size:40px;margin-bottom:4px;}
 .mascot-row.bounce{animation:mb 0.4s ease;}
 @keyframes mb{0%{transform:scale(1)}40%{transform:scale(1.4)}70%{transform:scale(0.88)}100%{transform:scale(1)}}
 
-.word-card{border-radius:24px;padding:1.5rem 1rem;text-align:center;margin-bottom:12px;border:3px solid transparent;transition:border-color 0.3s,background 0.3s;}
+.word-card{border-radius:20px;padding:0.8rem 1rem;text-align:center;margin-bottom:8px;border:3px solid transparent;transition:border-color 0.3s,background 0.3s;}
 .word-card.correct{background:#e0f5ee;border-color:#1D9E75;}
 .word-card.wrong{background:#fce8e8;border-color:#E24B4A;}
-.word-display{font-size:62px;font-weight:700;color:#1a1a2e;letter-spacing:4px;line-height:1.1;}
-.speak-btn{margin:10px auto 0;background:none;border:none;font-size:26px;cursor:pointer;opacity:0.7;-webkit-tap-highlight-color:transparent;transition:transform 0.1s;display:block;}
-.word-prompt{font-size:13px;color:#888;margin-top:6px;}
-.stars-row{display:flex;justify-content:center;gap:6px;min-height:32px;margin-bottom:8px;}
-.feedback{text-align:center;font-size:17px;font-weight:700;min-height:28px;margin-bottom:10px;color:#1a1a2e;}
-.phase-label{text-align:center;font-size:13px;color:#888;margin-bottom:10px;}
-.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;}
-.choice-btn{border-radius:18px;padding:14px 8px 26px;font-size:24px;font-weight:700;cursor:pointer;border:3px solid transparent;transition:transform 0.1s;text-align:center;position:relative;-webkit-tap-highlight-color:transparent;}
+.word-display{font-size:52px;font-weight:700;color:#1a1a2e;letter-spacing:3px;line-height:1.1;}
+.speak-btn{margin:4px auto 0;background:none;border:none;font-size:22px;cursor:pointer;opacity:0.7;-webkit-tap-highlight-color:transparent;transition:transform 0.1s;display:block;}
+
+.stars-row{display:flex;justify-content:center;gap:4px;min-height:24px;margin-bottom:4px;}
+.feedback{text-align:center;font-size:15px;font-weight:700;min-height:22px;margin-bottom:4px;color:#1a1a2e;}
+
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px;}
+.choice-btn{border-radius:16px;padding:12px 8px 24px;font-size:22px;font-weight:700;cursor:pointer;border:3px solid transparent;transition:transform 0.1s;text-align:center;position:relative;-webkit-tap-highlight-color:transparent;}
 .choice-btn:active{transform:scale(0.93);}
 .choice-btn.correct{background:#e0f5ee;border-color:#1D9E75;color:#085041;}
 .choice-btn.wrong{background:#fce8e8;border-color:#E24B4A;color:#7a1f1f;}
 .choice-btn:disabled{cursor:default;}
 .choice-speak{position:absolute;bottom:3px;right:7px;font-size:15px;opacity:0.55;background:none;border:none;cursor:pointer;padding:2px;-webkit-tap-highlight-color:transparent;}
-.action-btn{width:100%;padding:15px;border-radius:18px;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:transform 0.1s;margin-bottom:10px;-webkit-tap-highlight-color:transparent;}
+.action-btn{width:100%;padding:12px;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:transform 0.1s;margin-bottom:6px;-webkit-tap-highlight-color:transparent;}
 .action-btn:active{transform:scale(0.97);}
 .next-action{background:#e0f5ee;color:#085041;border:2px solid #5DCAA5;}
 .unlock-banner{border-radius:14px;padding:10px 14px;font-size:13px;text-align:center;margin-bottom:10px;display:none;font-weight:600;}
@@ -95,7 +95,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .voice-name{font-size:14px;font-weight:600;color:#1a1a2e;}
 .voice-lang{font-size:11px;color:#888;margin-top:2px;}
 .voice-preview{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;}
-.settings-btn{font-size:18px;background:none;border:none;cursor:pointer;padding:4px;opacity:0.6;-webkit-tap-highlight-color:transparent;}
+.gear-btn{font-size:22px;background:none;border:none;cursor:pointer;padding:4px;opacity:0.7;-webkit-tap-highlight-color:transparent;}
+.settings-menu{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;display:none;align-items:flex-end;}
+.settings-sheet{background:white;border-radius:24px 24px 0 0;padding:1.5rem;width:100%;max-width:420px;margin:0 auto;}
+.settings-title{font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:1rem;text-align:center;}
+.settings-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;cursor:pointer;border:2px solid #eee;background:white;margin-bottom:10px;width:100%;font-size:15px;font-weight:600;color:#1a1a2e;-webkit-tap-highlight-color:transparent;}
+.settings-item:active{background:#f5f5f5;}
+.settings-icon{font-size:22px;}
+.settings-danger{color:#E24B4A;border-color:#fce8e8;}
 .phonetic{font-size:16px;color:#aaa;letter-spacing:2px;margin-top:4px;min-height:22px;font-style:italic;}
 
 .profile-menu{background:white;border-radius:20px;border:2px solid #eee;padding:1rem;margin-top:0.5rem;}
@@ -151,11 +158,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   <div class="screen" id="game-screen">
     <div class="top-bar">
-      <div class="player-badge" id="player-badge" onclick="showPlayerMenu()">🧜‍♀️ Player</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <button class="settings-btn" onclick="showVoicePicker()" aria-label="Voice settings">🔈</button>
-        <button class="switch-btn" onclick="goHome()">switch player</button>
-      </div>
+      <div class="player-badge" id="player-badge">🧜‍♀️ Player</div>
+      <button class="gear-btn" onclick="showSettingsMenu()" aria-label="Settings">⚙️</button>
     </div>
 
     <div class="screen" id="player-menu-screen" style="display:none;">
@@ -169,6 +173,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
         <button class="save-btn" style="margin-bottom:8px;" onclick="goToEdit()">✏️ Edit profile</button>
         <button class="cancel-btn" onclick="hidePlayerMenu()">Back to game</button>
+      </div>
+    </div>
+
+    <div class="settings-menu" id="settings-menu" onclick="hideSettingsMenu(event)">
+      <div class="settings-sheet" onclick="event.stopPropagation()">
+        <div class="settings-title">Settings</div>
+        <button class="settings-item" onclick="hideSettingsMenu();showVoicePicker()"><span class="settings-icon">🔈</span> Change voice</button>
+        <button class="settings-item" onclick="hideSettingsMenu();goToEdit()"><span class="settings-icon">🎭</span> Change mascot</button>
+        <button class="settings-item" onclick="hideSettingsMenu();goHome()"><span class="settings-icon">👤</span> Switch player</button>
+        <button class="settings-item settings-danger" onclick="hideSettingsMenu();confirmResetCurrent()"><span class="settings-icon">🗑</span> Reset progress</button>
       </div>
     </div>
 
@@ -194,12 +208,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <div class="word-display" id="word-display">the</div>
             <div class="phonetic" id="phonetic-display" style="font-size:20px;color:#aaa;font-style:italic;margin:6px 0;min-height:28px;"></div>
             <button class="speak-btn" id="speak-btn" onclick="speakWord()" aria-label="Hear the word">🔊</button>
-            <div class="word-prompt" id="word-prompt">Tap 🔊 to hear the word!</div>
+            
           </div>
         </div>
         <div class="stars-row" id="stars-row"></div>
         <div class="feedback" id="feedback"></div>
-        <div class="phase-label" id="phase-label">Ready to be quizzed?</div>
+        
         <div class="choices" id="choices" style="display:none"></div>
         <button class="action-btn" id="flash-btn" onclick="startQuiz()">Quiz me! 🚀</button>
         <button class="action-btn next-action" id="next-btn" style="display:none" onclick="nextWord()">Next word →</button>
@@ -433,6 +447,18 @@ function saveEditPlayer(){
   showScreen("picker-screen");
 }
 
+function confirmResetCurrent(){
+  if(demoMode)return;
+  var name=pr().name;
+  if(confirm("Reset all progress for "+name+"?")){
+    var p=pr();
+    p.correct=0;p.streak=0;p.mastered={};
+    p.unlocked={prek:true,k:false,"1":false};
+    p.level="prek";p.queue=[];p.current=null;
+    saveData();
+    selectProfile(currentProfileId);
+  }
+}
 function confirmReset(){
   if(confirm("Reset all progress for "+profiles[editingProfileId].name+"?")){
     profiles[editingProfileId].correct=0;
@@ -516,6 +542,14 @@ function goHome(){
   showScreen("picker-screen");
 }
 
+function showSettingsMenu(){
+  var menu=document.getElementById("settings-menu");
+  menu.style.display="flex";
+}
+function hideSettingsMenu(e){
+  var menu=document.getElementById("settings-menu");
+  menu.style.display="none";
+}
 function showPlayerMenu(){
   document.getElementById("player-menu-screen").style.display="block";
   document.getElementById("main-game-content").style.display="none";
@@ -574,13 +608,13 @@ function renderWord(){
   document.getElementById("word-display").style.display="block";
   var phon=PRONOUNCE[p.current];
   document.getElementById("phonetic-display").textContent=phon?"( "+phon+" )":"";
-  document.getElementById("word-prompt").textContent="Tap 🔊 to hear the word!";
+  
   document.getElementById("feedback").textContent="";
   document.getElementById("stars-row").innerHTML="";
   document.getElementById("choices").style.display="none";
   document.getElementById("flash-btn").style.display="block";
   document.getElementById("next-btn").style.display="none";
-  document.getElementById("phase-label").textContent="Ready to be quizzed?";
+  
   var wc=document.getElementById("word-card");
   var m=demoMode?MASCOTS[0]:mascot();
   wc.style.background=m.bg;wc.style.borderColor=m.border;
@@ -603,7 +637,7 @@ function startQuiz(){
     document.getElementById("phonetic-display").style.color="#aaa";
   }
   document.getElementById("flash-btn").style.display="none";
-  document.getElementById("phase-label").textContent="Which word matches the sound?";
+  
   var p=demoMode?profiles["__demo__"]:pr();
   var wrong=shuffle(WORDS[p.level].filter(function(w){return w!==p.current;})).slice(0,3);
   var opts=shuffle([p.current].concat(wrong));
