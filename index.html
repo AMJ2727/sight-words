@@ -89,6 +89,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .complete-title{font-size:20px;font-weight:700;margin-bottom:6px;}
 .complete-sub{font-size:14px;margin-bottom:1.5rem;}
 .confetti-wrap{position:relative;overflow:hidden;}
+.settings-screen{background:white;border-radius:24px;border:2px solid #eee;padding:1.5rem;margin-top:0.5rem;}
+.voice-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:14px;border:2px solid #eee;background:white;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.voice-item.selected{border-color:#81D8D0;background:#e8faf9;}
+.voice-name{font-size:14px;font-weight:600;color:#1a1a2e;}
+.voice-lang{font-size:11px;color:#888;margin-top:2px;}
+.voice-preview{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent;}
+.settings-btn{font-size:18px;background:none;border:none;cursor:pointer;padding:4px;opacity:0.6;-webkit-tap-highlight-color:transparent;}
+.phonetic{font-size:16px;color:#aaa;letter-spacing:2px;margin-top:4px;min-height:22px;font-style:italic;}
 
 .profile-menu{background:white;border-radius:20px;border:2px solid #eee;padding:1rem;margin-top:0.5rem;}
 .menu-profile-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #eee;}
@@ -131,10 +139,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
+  <div class="screen" id="voice-picker-screen">
+    <div class="page-title">Choose a voice</div>
+    <div class="page-sub">Tap 🔊 to preview each voice</div>
+    <div class="settings-screen">
+      <div id="voice-list" style="max-height:400px;overflow-y:auto;"></div>
+      <button class="save-btn" style="margin-top:12px;" onclick="saveVoice()">Use this voice</button>
+      <button class="cancel-btn" onclick="backFromVoice()">Cancel</button>
+    </div>
+  </div>
+
   <div class="screen" id="game-screen">
     <div class="top-bar">
       <div class="player-badge" id="player-badge" onclick="showPlayerMenu()">🧜‍♀️ Player</div>
-      <button class="switch-btn" onclick="goHome()">switch player</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="settings-btn" onclick="showVoicePicker()" aria-label="Voice settings">🔈</button>
+        <button class="switch-btn" onclick="goHome()">switch player</button>
+      </div>
     </div>
 
     <div class="screen" id="player-menu-screen" style="display:none;">
@@ -171,6 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="confetti-wrap" id="confetti-wrap">
           <div class="word-card" id="word-card">
             <div class="word-display" id="word-display">the</div>
+            <div class="phonetic" id="phonetic-display" style="font-size:20px;color:#aaa;font-style:italic;margin:6px 0;min-height:28px;"></div>
             <button class="speak-btn" id="speak-btn" onclick="speakWord()" aria-label="Hear the word">🔊</button>
             <div class="word-prompt" id="word-prompt">Tap 🔊 to hear the word!</div>
           </div>
@@ -198,6 +220,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 var WORDS={prek:["a","and","away","big","blue","can","come","down","find","for","funny","go","help","here","I","in","is","it","jump","little","look","make","me","my","not","one","play","red","run","said","see","the","three","to","two","up","we","where","yellow","you"],k:["all","am","are","at","ate","be","black","brown","but","came","did","do","eat","four","get","good","have","he","into","like","must","new","no","now","on","our","out","please","pretty","ran","ride","saw","say","she","so","soon","that","there","they","this","too","under","want","was","well","went","what","white","who","will","with","yes"],"1":["after","again","an","any","ask","by","could","every","fly","from","give","going","had","has","her","him","his","how","just","know","let","live","may","of","old","once","open","over","put","round","some","stop","take","thank","them","think","walk","were","when"]};
 var LEVEL_NAMES={prek:"Pre-K",k:"Kindergarten","1":"Grade 1"};
 var UNLOCK_NEXT={prek:"k",k:"1"};
+var PRONOUNCE={
+  "a":"uh","the":"thuh","said":"sed","one":"wun","two":"too",
+  "to":"tuh","for":"fer","little":"li-dul","of":"uv","was":"wuz",
+  "are":"ar","were":"wer","they":"thay","their":"thair","there":"thair",
+  "what":"wut","where":"wair","who":"hoo","could":"kud","would":"wud",
+  "should":"shud","have":"hav","give":"giv","live":"liv","some":"sum",
+  "come":"kum","does":"duz","once":"wuns","into":"in-too","from":"frum",
+  "your":"yor","our":"owr","put":"put","again":"uh-gen","every":"ev-ree",
+  "going":"goh-ing","pretty":"pri-tee","away":"uh-way","down":"down",
+  "find":"fynd","funny":"fun-ee","help":"help","here":"heer","jump":"jump",
+  "look":"luk","make":"mayk","play":"play","run":"run","see":"see",
+  "three":"three","up":"up","where":"wair","yellow":"yel-oh","you":"yoo",
+  "all":"awl","am":"am","ate":"ayt","be":"bee","black":"blak","brown":"brown",
+  "but":"but","came":"kaym","did":"did","do":"doo","eat":"eet","four":"for",
+  "get":"get","good":"gud","he":"hee","like":"lyk","must":"must","new":"noo",
+  "no":"noh","now":"now","on":"on","out":"owt","please":"pleez","ran":"ran",
+  "ride":"ryd","saw":"saw","say":"say","she":"shee","so":"soh","soon":"soon",
+  "that":"that","this":"this","too":"too","under":"un-der","want":"wont",
+  "well":"wel","went":"went","white":"wyt","will":"wil","with":"with","yes":"yes",
+  "after":"af-ter","an":"an","any":"en-ee","ask":"ask","by":"by","fly":"fly",
+  "had":"had","has":"haz","her":"her","him":"him","his":"hiz","how":"how",
+  "just":"just","know":"noh","let":"let","may":"may","old":"ohld","open":"oh-pen",
+  "over":"oh-ver","round":"rownd","stop":"stop","take":"tayk","thank":"thank",
+  "them":"them","think":"think","walk":"wawk","when":"wen"
+};
 
 var MASCOTS=[
   {emoji:"🧜‍♀️",label:"Mermaid",bg:"#ddf0ff",border:"#85B7EB",text:"#0C447C",prog:"#378ADD",stat:"#ddf0ff",statText:"#0C447C",statLabel:"#185FA5",quiz:"#185FA5",unlock:"#ddf0ff",unlockBorder:"#85B7EB",unlockText:"#0C447C",complete:"#ddf0ff",completeBorder:"#85B7EB",completeTitle:"#0C447C",completeSub:"#185FA5",cel:["You found it! 🐚","Swimmingly done! 🌊","Magical! 🧜‍♀️","Ocean star! ⭐","Shell-ebrate! 🐠"]},
@@ -217,14 +264,88 @@ var answered=false;
 var editingProfileId=null;
 var selectedMascotIdx=0;
 var audioCtx=null;
+var selectedVoice=null;
+var tempSelectedVoice=null;
+var voicePickerFrom=null;
+
+function getVoices(){
+  return window.speechSynthesis.getVoices().filter(function(v){return v.lang.indexOf("en")===0;});
+}
+
+function showVoicePicker(){
+  voicePickerFrom="game";
+  tempSelectedVoice=selectedVoice;
+  renderVoiceList();
+  showScreen("voice-picker-screen");
+}
+
+function backFromVoice(){
+  tempSelectedVoice=null;
+  if(voicePickerFrom==="game") showScreen("game-screen");
+  else showScreen("picker-screen");
+}
+
+function renderVoiceList(){
+  var list=document.getElementById("voice-list");
+  list.innerHTML="";
+  var voices=getVoices();
+  if(voices.length===0){
+    list.innerHTML='<div style="text-align:center;color:#888;padding:1rem;">Loading voices...</div>';
+    setTimeout(renderVoiceList,500);
+    return;
+  }
+  voices.forEach(function(v,i){
+    var item=document.createElement("div");
+    item.className="voice-item"+(v===tempSelectedVoice?" selected":"");
+    var info=document.createElement("div");
+    var nameEl=document.createElement("div");nameEl.className="voice-name";nameEl.textContent=v.name;
+    var langEl=document.createElement("div");langEl.className="voice-lang";langEl.textContent=v.lang+(v.localService?" • on device":"• online");
+    info.appendChild(nameEl);info.appendChild(langEl);
+    var preview=document.createElement("button");
+    preview.className="voice-preview";preview.textContent="🔊";
+    preview.setAttribute("aria-label","Preview "+v.name);
+    preview.onclick=function(voice){return function(e){
+      e.stopPropagation();
+      window.speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance("the cat sat on the mat");
+      u.voice=voice;u.rate=0.9;u.pitch=1.1;u.volume=1;
+      window.speechSynthesis.speak(u);
+    };}(v);
+    item.appendChild(info);item.appendChild(preview);
+    item.onclick=function(voice,el){return function(){
+      tempSelectedVoice=voice;
+      document.querySelectorAll(".voice-item").forEach(function(el){el.classList.remove("selected");});
+      el.classList.add("selected");
+    };}(v,item);
+    list.appendChild(item);
+  });
+}
+
+function saveVoice(){
+  selectedVoice=tempSelectedVoice;
+  try{localStorage.setItem("sightwords_voice",selectedVoice?selectedVoice.name:"");}catch(e){}
+  backFromVoice();
+}
+
+function loadSavedVoice(){
+  try{
+    var saved=localStorage.getItem("sightwords_voice");
+    if(saved){
+      var voices=getVoices();
+      for(var i=0;i<voices.length;i++){if(voices[i].name===saved){selectedVoice=voices[i];return;}}
+    }
+  }catch(e){}
+}
+window.speechSynthesis.onvoiceschanged=function(){loadSavedVoice();};
 
 function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
 function playTap(){try{var ctx=getAudio(),o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type="sine";o.frequency.setValueAtTime(600,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.06);g.gain.setValueAtTime(0.15,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);o.start(ctx.currentTime);o.stop(ctx.currentTime+0.1);}catch(e){}}
 function playCorrect(streak){try{var ctx=getAudio(),notes=streak>=5?[523,659,784,1047]:streak>=3?[523,659,784]:[523,659];notes.forEach(function(freq,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type="sine";var t=ctx.currentTime+i*0.12;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.18);o.start(t);o.stop(t+0.2);});}catch(e){}}
 function playWrong(){try{var ctx=getAudio();[[220,0],[196,0.2]].forEach(function(pair){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type="sawtooth";var t=ctx.currentTime+pair[1];o.frequency.setValueAtTime(pair[0],t);o.frequency.exponentialRampToValueAtTime(pair[0]*0.7,t+0.25);g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.28);o.start(t);o.stop(t+0.3);});}catch(e){}}
 function playLevelComplete(){try{var ctx=getAudio(),melody=[523,587,659,698,784,880,988,1047];melody.forEach(function(freq,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type="sine";var t=ctx.currentTime+i*0.1;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.18,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);o.start(t);o.stop(t+0.22);});}catch(e){}}
-function speakWord(){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(pr().current);u.rate=0.85;u.pitch=1.1;u.volume=1;var btn=document.getElementById("speak-btn");btn.style.transform="scale(1.3)";setTimeout(function(){btn.style.transform="scale(1)";},200);window.speechSynthesis.speak(u);}catch(e){}}
-function speakText(word){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(word);u.rate=0.85;u.pitch=1.1;u.volume=1;window.speechSynthesis.speak(u);}catch(e){}}
+function makeUtterance(word){var u=new SpeechSynthesisUtterance(word);u.rate=0.9;u.pitch=1.1;u.volume=1;if(selectedVoice)u.voice=selectedVoice;else u.lang="en-US";return u;}
+function speakWord(){try{window.speechSynthesis.cancel();var p=demoMode?profiles["__demo__"]:pr();var u=makeUtterance(p.current);var btn=document.getElementById("speak-btn");btn.style.transform="scale(1.3)";setTimeout(function(){btn.style.transform="scale(1)";},200);window.speechSynthesis.speak(u);}catch(e){}}
+function speakText(word){try{window.speechSynthesis.cancel();var u=makeUtterance(word);window.speechSynthesis.speak(u);}catch(e){}}
 
 function saveData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(profiles));}catch(e){}}
 function loadData(){try{var s=localStorage.getItem(STORAGE_KEY);if(s)profiles=JSON.parse(s);}catch(e){}}
@@ -450,6 +571,9 @@ function updateLevelPills(){
 function renderWord(){
   var p=demoMode?profiles["__demo__"]:pr();
   document.getElementById("word-display").textContent=p.current;
+  document.getElementById("word-display").style.display="block";
+  var phon=PRONOUNCE[p.current];
+  document.getElementById("phonetic-display").textContent=phon?"( "+phon+" )":"";
   document.getElementById("word-prompt").textContent="Tap 🔊 to hear the word!";
   document.getElementById("feedback").textContent="";
   document.getElementById("stars-row").innerHTML="";
@@ -466,8 +590,20 @@ function renderWord(){
 
 function startQuiz(){
   playTap();
+  var p=demoMode?profiles["__demo__"]:pr();
+  var phon=PRONOUNCE[p.current];
+  document.getElementById("word-display").style.display="none";
+  if(phon){
+    document.getElementById("phonetic-display").textContent="( "+phon+" )";
+    document.getElementById("phonetic-display").style.fontSize="28px";
+    document.getElementById("phonetic-display").style.color="#534AB7";
+  } else {
+    document.getElementById("phonetic-display").textContent="🔊";
+    document.getElementById("phonetic-display").style.fontSize="36px";
+    document.getElementById("phonetic-display").style.color="#aaa";
+  }
   document.getElementById("flash-btn").style.display="none";
-  document.getElementById("phase-label").textContent="Which word do you see?";
+  document.getElementById("phase-label").textContent="Which word matches the sound?";
   var p=demoMode?profiles["__demo__"]:pr();
   var wrong=shuffle(WORDS[p.level].filter(function(w){return w!==p.current;})).slice(0,3);
   var opts=shuffle([p.current].concat(wrong));
@@ -625,6 +761,7 @@ function tryLevel(level){
 }
 
 loadData();
+loadSavedVoice();
 renderProfiles();
 </script>
 </body>
